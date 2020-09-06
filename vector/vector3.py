@@ -2,7 +2,7 @@
 
 import math
 from typing import Union
-import mathutils
+from utils import mathutils
 
 
 class Vector3:

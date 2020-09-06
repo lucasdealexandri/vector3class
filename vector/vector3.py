@@ -2,7 +2,7 @@
 
 import math
 from typing import Union
-from utils import mathutils
+import mathutils
 
 
 class Vector3:
@@ -114,9 +114,6 @@ class Vector3:
 
         return (self.x, self.y, self.z) == (other.x, other.y, other.z)
 
-    # In need of an operator like radd and such, that allows to compare different types placed before
-    # e.g. (1, 2) > Vector3(1, 2, 3) will throw TypeError while Vector3(1, 2, 3) > (1, 2) won't.
-
     def __gt__(self, other: Union[int, float, list, tuple, 'Vector3']) -> bool:
 
         if type(other) in (list, tuple):
@@ -128,6 +125,18 @@ class Vector3:
             return self.norm > other
 
         return self.norm > other.norm
+    
+    def __lt__(self, other: Union[int, float, list, tuple, 'Vector3']) -> bool:
+
+        if type(other) in (list, tuple):
+
+            other = Vector3(*other)
+
+        if type(other) in (int, float):
+
+            return self.norm < other
+
+        return self.norm < other.norm
 
     def __ge__(self, other: Union[int, float, list, tuple, 'Vector3']) -> bool:
 
@@ -140,6 +149,18 @@ class Vector3:
             return self.norm >= other
 
         return self.norm >= other.norm
+    
+    def __le__(self, other: Union[int, float, list, tuple, 'Vector3']) -> bool:
+
+        if type(other) in (list, tuple):
+
+            other = Vector3(*other)
+
+        if type(other) in (int, float):
+
+            return self.norm <= other
+
+        return self.norm <= other.norm
 
     def __repr__(self) -> str:
 
@@ -147,7 +168,7 @@ class Vector3:
 
     def __str__(self) -> str:
 
-        return str(self.values)
+        return self.pprint()
 
     def __iter__(self) -> 'tuple_iterator':
 
@@ -346,4 +367,4 @@ if __name__ == '__main__':
     v1 = Vector3(*a)
     v2 = Vector3(1, 3, 2)
 
-    print(v1 == v2)
+    print((1, 2) > Vector3(1, 2, 3))

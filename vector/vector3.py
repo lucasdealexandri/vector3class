@@ -179,6 +179,11 @@ class Vector3:
         return self.values[key]
 
     def angle(self, other: 'Vector3', degree: bool = False, pretty_print: bool = False) -> Union[float, str]:
+        
+        '''
+        Returns the angle between two vectors
+        e.g. Vector3(1, 2, 3).angle(Vector3(2, 4, 6)) == 0
+        '''
 
         angle_radians = math.acos(self.dot(other) / (self.norm * other.norm))
         angle_degrees = 180 / math.pi * angle_radians
@@ -198,36 +203,67 @@ class Vector3:
         return mathutils.closestnum(angle_radians)
 
     def normalize(self) -> 'Vector3':
+        
+        '''
+        Returns a normalized vector, i.e. a vector with the same direction with norm (magnitude) == 1
+        e.g. Vector3(2, 0, 0).normalize() == Vector3(1, 0, 0)
+        '''
 
         normalized = tuple(mathutils.closestnum(a / self.norm) for a in self)
 
         return Vector3(*normalized)
 
     def scalar_multiplication(self, other: Union[int, float]) -> 'Vector3':
+        
+        '''
+        Returns the multiplication between a vector and a scalar
+        e.g. Vector3(1, 2, 3) * 2 == Vector3(2, 4, 6)
+        '''
 
         scaled_components = tuple(mathutils.closestnum(a * other) for a in self)
 
         return Vector3(*scaled_components)
 
     def scalar_division(self, other: Union[int, float]) -> 'Vector3':
+        
+        '''
+        Returns the division between a vector and a scalar
+        e.g. Vector3(3, 6, 9) / 3 == Vector3(1, 2, 3)
+        '''
 
         scaled_components = tuple(mathutils.closestnum(a / other) for a in self)
 
         return Vector3(*scaled_components)
 
     def vector_addition(self, other: 'Vector3') -> 'Vector3':
+        
+        '''
+        Returns the sum of two vectors
+        Namely a + b
+        '''
 
         summed_components = tuple(mathutils.closestnum(a + b) for a, b in zip(self, other))
 
         return Vector3(*summed_components)
 
     def vector_subtraction(self, other: 'Vector3') -> 'Vector3':
+        
+        '''
+        Returns the difference between two vectors
+        Namely a - b
+        '''
 
         subtracted_components = tuple(mathutils.closestnum(a - b) for a, b in zip(self, other))
 
         return Vector3(*subtracted_components)
 
     def dot(self, other: 'Vector3') -> float:
+        
+        '''
+        Returns the dot product between two vectors.
+        Namely a • b
+        Can be used as a * b in code.
+        '''
 
         dot_product = sum(a * b for a, b in zip(self, other))
 
@@ -235,6 +271,12 @@ class Vector3:
 
     # Still not scalable (Only works for 3D/2D vectors)
     def cross(self, other: 'Vector3') -> 'Vector3':
+        
+        '''
+        Returns the cross product between two vectors.
+        Namely a x b
+        Can be used as a ** b in code.
+        '''
 
         x = mathutils.closestnum(self.y * other.z - self.z * other.y)
         y = mathutils.closestnum(self.z * other.x - self.x * other.z)
@@ -244,6 +286,17 @@ class Vector3:
 
     @property
     def dimension(self) -> int:
+        
+        '''
+        The smallest dimension in which a vector could be represented:
+        e.g. Vector3(3, 0, 0) can be represented in the number line, so it can be represented in at least one dimension.
+        
+        Vector3(1, 0, 2) for instance, might look like it needs to be 3D, but if you look closer you can see
+        it can easly be represented in a plane, namely the XZ plane, so the smallest dimension it can be represented is 2.
+        
+        In short, all non zero values in the vector are accounted as a new dimension, so in order for a vector
+        to be considered to have 3 dimensions, it needs 3 non-zero values.
+        '''
 
         dimensions = 0
 
@@ -257,6 +310,10 @@ class Vector3:
 
     @property
     def norm(self) -> float:
+        
+        '''
+        Returns the norm (magnitude) of the vector.
+        '''
 
         components_square = tuple(component ** 2 for component in self)
 
@@ -338,7 +395,6 @@ class MagAngle(Vector3):
     '''
     MagAngle == Magnitude and Angle.
     Get a Vector3 object giving the norm of the vector and the angle with the horizon.
-    Currently only works with 2D vectors (Because it only asks for one angle).
     '''
 
     def __init__(self, norm: Union[int, float], angle: Union[int, float] = 0, degree: bool = False):
@@ -351,6 +407,72 @@ class MagAngle(Vector3):
         y = mathutils.closestnum(norm * math.sin(angle))
 
         super().__init__(x, y)
+        
+        
+class Polar(MagAngle):
+    
+    '''
+    Polar form of a vector; essentially the same as MagAngle, but with "proper" notation.
+    Returns a 2D Vector3 object (i.e. a Vector3 with the z component = 0).
+    '''
+    
+    def __init__(self, r: Union[int, float], theta: Union[int, float] = 0, degree: bool = False):
+        
+        self.r = r
+        self.theta = theta
+        
+        super().__init__(r, theta, degree)
+        
+
+class Cylindrical(Vector3):
+    
+    '''
+    Cylindrical form of a vector: returns a Vector3 object based on the 
+    cylindrical coordinate of the tip of the vector.
+    The convention for r, theta and z are shown in this study guide:
+    http://sites.science.oregonstate.edu/math/home/programs/undergrad/CalculusQuestStudyGuides/vcalc/coord/coord.html
+    '''
+    
+    def __init__(self, r: Union[int, float], theta: Union[int, float], z: Union[int, float], degree: bool = False):
+        
+        self.r = r
+        self.theta = theta
+        self.z = z
+        
+        if degree:
+            
+            theta = math.radians(theta)
+            
+        self.x = mathutils.closestnum(r * math.cos(theta))
+        self.y = mathutils.closestnum(r * math.sin(theta))
+        
+        super.__init__(self.x, self.y, self.z)
+        
+
+class Spherical(Vector3):
+    
+    '''
+    Vector3 object based on the spherical coordinate of the tip of the vector
+    Conventions for rho, theta and phi are based on the following study guide:
+    http://sites.science.oregonstate.edu/math/home/programs/undergrad/CalculusQuestStudyGuides/vcalc/coord/coord.html
+    '''
+    
+    def __init__(self, rho: Union[int, float], theta: Union[int, float], phi: Union[int, float], degree: bool = False):
+        
+        self.rho = rho
+        self.theta = theta
+        self.phi = phi
+        
+        if degree:
+            
+            rho = math.radians(rho)
+            phi = math.radians(phi)
+            
+        self.x = mathutils.closestnum(rho * math.sin(phi) * math.cos(theta))
+        self.y = mathutils.closestnum(rho * math.sin(phi) * math.sin(theta))
+        self.z = mathutils.closestnum(rho * math.cos(phi))
+        
+        super.__init__(self.x, self.y, self.z)
 
 
 def angle(a: 'Vector3', b: 'Vector3', degree: bool = False) -> Union[int, float]:

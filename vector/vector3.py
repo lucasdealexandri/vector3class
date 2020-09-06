@@ -168,7 +168,7 @@ class Vector3:
 
     def __str__(self) -> str:
 
-        return self.pprint()
+        return str(self.values)
 
     def __iter__(self) -> 'tuple_iterator':
 

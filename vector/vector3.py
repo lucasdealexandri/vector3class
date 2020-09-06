@@ -15,7 +15,7 @@ class Vector3:
     Scalar multiplication e.g. 2 * Vector3(1, 2, 3) == Vector3(2, 4, 6)
 
     Vector multiplication: a * b for dot product and a ** b for cross product
-    (Alternatively, one could use a.dot(b) and a.cross(b) to explicitely effectuate the operations)
+    (Alternatively, one could use a.dot(b) and a.cross(b) to explicitly effectuate the operations)
 
     Vector equality: Two vectors are the same if all their components are the same.
 

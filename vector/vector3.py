@@ -399,14 +399,30 @@ class MagAngle(Vector3):
 
     def __init__(self, norm: Union[int, float], angle: Union[int, float] = 0, degree: bool = False):
         
+        self.ang = angle
+        
         if degree:
             
             angle = math.radians(angle)
 
-        x = mathutils.closestnum(norm * math.cos(angle))
-        y = mathutils.closestnum(norm * math.sin(angle))
+        self.x = mathutils.closestnum(norm * math.cos(angle))
+        self.y = mathutils.closestnum(norm * math.sin(angle))
 
-        super().__init__(x, y)
+        super().__init__(self.x, self.y)
+        
+    def __str__(self) -> str:
+        
+        # Figure out a way to factor pi out and represent it.
+        
+        return str((self.norm, self.ang))
+    
+    def __repr__(self) -> str:
+        
+        return self.__str__()
+    
+    def to_cartesian(self) -> str:
+        
+        return str((self.x, self.y))
         
         
 class Polar(MagAngle):
@@ -422,6 +438,16 @@ class Polar(MagAngle):
         self.theta = theta
         
         super().__init__(r, theta, degree)
+        
+    def __str__(self) -> str:
+        
+        # Figure out a way to factor pi out and represent it.
+        
+        return str((self.r, self.theta))
+    
+    def __repr__(self) -> str:
+        
+        return self.__str__()
         
 
 class Cylindrical(Vector3):
@@ -446,7 +472,17 @@ class Cylindrical(Vector3):
         self.x = mathutils.closestnum(r * math.cos(theta))
         self.y = mathutils.closestnum(r * math.sin(theta))
         
-        super.__init__(self.x, self.y, self.z)
+        super().__init__(self.x, self.y, self.z)
+        
+    def __str__(self) -> str:
+        
+        # Figure out a way to factor pi out and represent it.
+        
+        return str((self.r, self.theta, self.z))
+    
+    def __repr__(self) -> str:
+        
+        return self.__str__()
         
 
 class Spherical(Vector3):
@@ -472,7 +508,17 @@ class Spherical(Vector3):
         self.y = mathutils.closestnum(rho * math.sin(phi) * math.sin(theta))
         self.z = mathutils.closestnum(rho * math.cos(phi))
         
-        super.__init__(self.x, self.y, self.z)
+        super().__init__(self.x, self.y, self.z)
+        
+    def __str__(self) -> str:
+        
+        # Figure out a way to factor pi out and represent it.
+        
+        return str((self.rho, self.theta, self.phi))
+    
+    def __repr__(self) -> str:
+        
+        return self.__str__()
 
 
 def angle(a: 'Vector3', b: 'Vector3', degree: bool = False) -> Union[int, float]:

@@ -1,5 +1,4 @@
-from mathutils import Vector3, MagAngle, angle
-from math import radians, pi, ceil, floor
+from vector3 import Vector3, MagAngle, angle
 
 a = Vector3(0, 0, 1)
 b = Vector3(1, 0, 2)

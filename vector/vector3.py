@@ -2,7 +2,11 @@
 
 import math
 from typing import Union
-import mathutils
+from vectorutils import closestnum, where_is_pi
+
+RealNumber = Scalar = Union[int, float]
+Coordinate = Union[list, tuple]
+Vector = Union[list, float, 'Vector3']
 
 
 class Vector3:
@@ -25,7 +29,7 @@ class Vector3:
     Vector representation: Vector3(1, 2, 3) returns 1i + 2j + 3k (WIP)
     '''
 
-    def __init__(self, *args: Union[list, tuple]):
+    def __init__(self, *args: Coordinate):
 
         self.args = args
 
@@ -48,35 +52,35 @@ class Vector3:
 
         return self.norm
 
-    def __add__(self, other: Union[list, tuple, 'Vector3']) -> 'Vector3':
+    def __add__(self, other: Vector) -> 'Vector3':
 
         if type(other) in (list, tuple):
 
             other = Vector3(*other)
 
-        return self.vector_addition(other)
+        return self._vector_addition(other)
 
-    def __radd__(self, other: Union[list, tuple, 'Vector3']) -> 'Vector3':
+    def __radd__(self, other: Vector) -> 'Vector3':
 
         return self.__add__(other)
 
-    def __sub__(self, other: Union[list, tuple, 'Vector3']) -> 'Vector3':
+    def __sub__(self, other: Vector) -> 'Vector3':
 
         if type(other) in (list, tuple):
 
             other = Vector3(*other)
 
-        return self.vector_subtraction(other)
+        return self._vector_subtraction(other)
 
-    def __rsub__(self, other: Union[list, tuple, 'Vector3']) -> 'Vector3':
+    def __rsub__(self, other: Vector) -> 'Vector3':
 
         return self.__sub__(other)
 
-    def __mul__(self, other: Union[int, float, list, tuple, 'Vector3']) -> Union[int, float]:
+    def __mul__(self, other: Union[Scalar, Vector]) -> RealNumber:
 
         if type(other) in (int, float):
 
-            return self.scalar_multiplication(other)
+            return self._scalar_multiplication(other)
 
         if type(other) in (list, tuple):
 
@@ -84,17 +88,17 @@ class Vector3:
 
         return self.dot(other)
 
-    def __rmul__(self, other: Union[int, float, list, tuple, 'Vector3']) -> Union[int, float]:
+    def __rmul__(self, other: Union[Scalar, Vector]) -> RealNumber:
 
         return self.__mul__(other)
 
-    def __truediv__(self, other: Union[int, float, list, tuple, 'Vector3']) -> 'Vector3':
+    def __truediv__(self, other: Union[Scalar, Vector]) -> 'Vector3':
 
         if type(other) in (int, float):
 
-            return self.scalar_division(other)
+            return self._scalar_division(other)
 
-    def __pow__(self, other: Union[list, tuple, 'Vector3']) -> 'Vector3':
+    def __pow__(self, other: Vector) -> 'Vector3':
 
         if type(other) in (list, tuple):
 
@@ -102,11 +106,11 @@ class Vector3:
 
         return self.cross(other)
 
-    def __rpow__(self, other: Union[list, tuple, 'Vector3']) -> 'Vector3':
+    def __rpow__(self, other: Vector) -> 'Vector3':
 
         return self.__pow__(other)
 
-    def __eq__(self, other: Union[list, tuple, 'Vector3']) -> bool:
+    def __eq__(self, other: Vector) -> bool:
 
         if type(other) in (list, tuple):
 
@@ -114,7 +118,7 @@ class Vector3:
 
         return (self.x, self.y, self.z) == (other.x, other.y, other.z)
 
-    def __gt__(self, other: Union[int, float, list, tuple, 'Vector3']) -> bool:
+    def __gt__(self, other: Union[Scalar, Vector]) -> bool:
 
         if type(other) in (list, tuple):
 
@@ -126,7 +130,7 @@ class Vector3:
 
         return self.norm > other.norm
     
-    def __lt__(self, other: Union[int, float, list, tuple, 'Vector3']) -> bool:
+    def __lt__(self, other: Union[Scalar, Vector]) -> bool:
 
         if type(other) in (list, tuple):
 
@@ -138,7 +142,7 @@ class Vector3:
 
         return self.norm < other.norm
 
-    def __ge__(self, other: Union[int, float, list, tuple, 'Vector3']) -> bool:
+    def __ge__(self, other: Union[Scalar, Vector]) -> bool:
 
         if type(other) in (list, tuple):
 
@@ -150,7 +154,7 @@ class Vector3:
 
         return self.norm >= other.norm
     
-    def __le__(self, other: Union[int, float, list, tuple, 'Vector3']) -> bool:
+    def __le__(self, other: Union[Scalar, Vector]) -> bool:
 
         if type(other) in (list, tuple):
 
@@ -174,7 +178,7 @@ class Vector3:
 
         return self.values.__iter__()
 
-    def __getitem__(self, key) -> Union[int, float]:
+    def __getitem__(self, key) -> RealNumber:
 
         return self.values[key]
 
@@ -194,13 +198,13 @@ class Vector3:
 
                 return f'{angle_degrees:.2f}º'
 
-            return mathutils.closestnum(angle_degrees)
+            return closestnum(angle_degrees)
 
         if pretty_print:
 
             return f'{angle_radians:.3f} rad'
 
-        return mathutils.closestnum(angle_radians)
+        return closestnum(angle_radians)
 
     def normalize(self) -> 'Vector3':
         
@@ -209,51 +213,51 @@ class Vector3:
         e.g. Vector3(2, 0, 0).normalize() == Vector3(1, 0, 0)
         '''
 
-        normalized = tuple(mathutils.closestnum(a / self.norm) for a in self)
+        normalized = tuple(closestnum(a / self.norm) for a in self)
 
         return Vector3(*normalized)
 
-    def scalar_multiplication(self, other: Union[int, float]) -> 'Vector3':
+    def _scalar_multiplication(self, other: RealNumber) -> 'Vector3':
         
         '''
         Returns the multiplication between a vector and a scalar
         e.g. Vector3(1, 2, 3) * 2 == Vector3(2, 4, 6)
         '''
 
-        scaled_components = tuple(mathutils.closestnum(a * other) for a in self)
+        scaled_components = tuple(closestnum(a * other) for a in self)
 
         return Vector3(*scaled_components)
 
-    def scalar_division(self, other: Union[int, float]) -> 'Vector3':
+    def _scalar_division(self, other: RealNumber) -> 'Vector3':
         
         '''
         Returns the division between a vector and a scalar
         e.g. Vector3(3, 6, 9) / 3 == Vector3(1, 2, 3)
         '''
 
-        scaled_components = tuple(mathutils.closestnum(a / other) for a in self)
+        scaled_components = tuple(closestnum(a / other) for a in self)
 
         return Vector3(*scaled_components)
 
-    def vector_addition(self, other: 'Vector3') -> 'Vector3':
+    def _vector_addition(self, other: 'Vector3') -> 'Vector3':
         
         '''
         Returns the sum of two vectors
         Namely a + b
         '''
 
-        summed_components = tuple(mathutils.closestnum(a + b) for a, b in zip(self, other))
+        summed_components = tuple(closestnum(a + b) for a, b in zip(self, other))
 
         return Vector3(*summed_components)
 
-    def vector_subtraction(self, other: 'Vector3') -> 'Vector3':
+    def _vector_subtraction(self, other: 'Vector3') -> 'Vector3':
         
         '''
         Returns the difference between two vectors
         Namely a - b
         '''
 
-        subtracted_components = tuple(mathutils.closestnum(a - b) for a, b in zip(self, other))
+        subtracted_components = tuple(closestnum(a - b) for a, b in zip(self, other))
 
         return Vector3(*subtracted_components)
 
@@ -267,7 +271,7 @@ class Vector3:
 
         dot_product = sum(a * b for a, b in zip(self, other))
 
-        return mathutils.closestnum(dot_product)
+        return closestnum(dot_product)
 
     # Still not scalable (Only works for 3D/2D vectors)
     def cross(self, other: 'Vector3') -> 'Vector3':
@@ -278,9 +282,9 @@ class Vector3:
         Can be used as a ** b in code.
         '''
 
-        x = mathutils.closestnum(self.y * other.z - self.z * other.y)
-        y = mathutils.closestnum(self.z * other.x - self.x * other.z)
-        z = mathutils.closestnum(self.x * other.y - self.y * other.x)
+        x = closestnum(self.y * other.z - self.z * other.y)
+        y = closestnum(self.z * other.x - self.x * other.z)
+        z = closestnum(self.x * other.y - self.y * other.x)
 
         return Vector3(x, y, z)
 
@@ -317,9 +321,37 @@ class Vector3:
 
         components_square = tuple(component ** 2 for component in self)
 
-        return mathutils.closestnum(math.sqrt(sum(components_square)))
+        return closestnum(math.sqrt(sum(components_square)))
+    
+    def to_cylindrical(self):
+        
+        self.r = closestnum(math.sqrt(self.x ** 2 + self.y ** 2))
+        self.theta = closestnum(math.atan2(self.y, self.x))
+        
+        pretty_theta = where_is_pi(self.theta)
+        
+        return f'({self.r}, {pretty_theta}, {self.z})'
+    
+    def to_spherical(self):
+        
+        sum_squared_components = sum([components ** 2 for components in (self.x, self.y, self.z)])
+        
+        self.rho = closestnum(math.sqrt(sum_squared_components))
+        self.theta = closestnum(math.atan2(self.y, self.x))
+        self.phi = closestnum(math.acos(self.z / self.rho))
+        
+        pretty_theta = where_is_pi(self.theta)
+        pretty_phi = where_is_pi(self.phi)
+        
+        return f'({self.rho}, {pretty_theta}, {pretty_phi})'
 
-    def pprint(self) -> None:
+    def beautify(self) -> str:
+        
+        '''
+        Base for pretty printing; it returns a vector (a, b, c) in the form of
+        ai + bj + ck. This function also accounts for zero valued components
+        e.g. Vector3(1, 0, -4).beautify would return 1i - 4k
+        '''
         
         # This is a mess I am so sorry
         
@@ -330,7 +362,7 @@ class Vector3:
         if self.x != 0:
             
             if self.x in (-1, 1): x = 'i'
-            else: x = f'{abs(mathutils.closestnum(self.x))}i'
+            else: x = f'{abs(closestnum(self.x))}i'
             
             if self.x < 0: signs.append(' - ')
             else: signs.append(' + ')
@@ -345,7 +377,7 @@ class Vector3:
         if self.y != 0:
             
             if self.y in (-1, 1): y = 'j' 
-            else: y = f'{abs(mathutils.closestnum(self.y))}j'
+            else: y = f'{abs(closestnum(self.y))}j'
             
             if self.y < 0: signs.append(' - ')
             else: signs.append(' + ')
@@ -360,7 +392,7 @@ class Vector3:
         if self.z != 0:
             
             if self.z in (-1, 1): z = 'k'
-            else: z = f'{abs(mathutils.closestnum(self.z))}k'
+            else: z = f'{abs(closestnum(self.z))}k'
             
             if self.z < 0: signs.append(' - ')
             else:signs.append(' + ')
@@ -371,13 +403,12 @@ class Vector3:
         
         variables.append(z)
         
-        if len(variables) == 0:
-            
-            print('null vector')
-            return None
-        
         signs = [sign for sign in signs if sign != '']
         variables = [variable for variable in variables if variable != '']
+        
+        if len(variables) == 0:
+            
+            return 'null vector'
             
         if signs[0] == ' + ': signs[0] = ''
         elif signs[0] == ' - ': signs[0] = '-'
@@ -386,10 +417,13 @@ class Vector3:
             
             pprint_string += signs[i] + variables[i]
     
-        print(pprint_string)
-        return None
+        return pprint_string
 
-
+    def pprint(self) -> None:
+        
+        print(self.beautify())
+    
+    
 class MagAngle(Vector3):
 
     '''
@@ -397,30 +431,29 @@ class MagAngle(Vector3):
     Get a Vector3 object giving the norm of the vector and the angle with the horizon.
     '''
 
-    def __init__(self, norm: Union[int, float], angle: Union[int, float] = 0, degree: bool = False):
+    def __init__(self, norm: RealNumber, angle: RealNumber = 0, degree: bool = False, polar_repr: bool = False):
         
         self.ang = angle
+        
+        self._polar_repr = polar_repr
         
         if degree:
             
             angle = math.radians(angle)
 
-        self.x = mathutils.closestnum(norm * math.cos(angle))
-        self.y = mathutils.closestnum(norm * math.sin(angle))
+        self.x = closestnum(norm * math.cos(angle))
+        self.y = closestnum(norm * math.sin(angle))
 
         super().__init__(self.x, self.y)
-        
+    
     def __str__(self) -> str:
         
         # Figure out a way to factor pi out and represent it.
         
-        return str((self.norm, self.ang))
-    
-    def __repr__(self) -> str:
-        
-        return self.__str__()
-    
-    def to_cartesian(self) -> str:
+        if self._polar_repr:
+
+            pretty_angle = where_is_pi(self.ang)
+            return f'({self.norm}, {pretty_angle})'
         
         return str((self.x, self.y))
         
@@ -432,22 +465,12 @@ class Polar(MagAngle):
     Returns a 2D Vector3 object (i.e. a Vector3 with the z component = 0).
     '''
     
-    def __init__(self, r: Union[int, float], theta: Union[int, float] = 0, degree: bool = False):
+    def __init__(self, r: RealNumber, theta: RealNumber = 0, degree: bool = False, polar_repr: bool = False):
         
         self.r = r
         self.theta = theta
         
-        super().__init__(r, theta, degree)
-        
-    def __str__(self) -> str:
-        
-        # Figure out a way to factor pi out and represent it.
-        
-        return str((self.r, self.theta))
-    
-    def __repr__(self) -> str:
-        
-        return self.__str__()
+        super().__init__(r, theta, degree, polar_repr)
         
 
 class Cylindrical(Vector3):
@@ -459,18 +482,20 @@ class Cylindrical(Vector3):
     http://sites.science.oregonstate.edu/math/home/programs/undergrad/CalculusQuestStudyGuides/vcalc/coord/coord.html
     '''
     
-    def __init__(self, r: Union[int, float], theta: Union[int, float], z: Union[int, float], degree: bool = False):
+    def __init__(self, r: RealNumber, theta: RealNumber, z: RealNumber, degree: bool = False, cylindrical_repr: bool = False):
         
         self.r = r
         self.theta = theta
         self.z = z
         
+        self._cylindrical_repr = cylindrical_repr
+        
         if degree:
             
             theta = math.radians(theta)
             
-        self.x = mathutils.closestnum(r * math.cos(theta))
-        self.y = mathutils.closestnum(r * math.sin(theta))
+        self.x = closestnum(r * math.cos(theta))
+        self.y = closestnum(r * math.sin(theta))
         
         super().__init__(self.x, self.y, self.z)
         
@@ -478,11 +503,13 @@ class Cylindrical(Vector3):
         
         # Figure out a way to factor pi out and represent it.
         
-        return str((self.r, self.theta, self.z))
-    
-    def __repr__(self) -> str:
+        if self._cylindrical_repr:
+            
+            pretty_theta = where_is_pi(self.theta)
+            
+            return f'({self.r}, {pretty_theta}, {self.z}))'
         
-        return self.__str__()
+        return str((self.x, self.y, self.z))
         
 
 class Spherical(Vector3):
@@ -493,20 +520,22 @@ class Spherical(Vector3):
     http://sites.science.oregonstate.edu/math/home/programs/undergrad/CalculusQuestStudyGuides/vcalc/coord/coord.html
     '''
     
-    def __init__(self, rho: Union[int, float], theta: Union[int, float], phi: Union[int, float], degree: bool = False):
+    def __init__(self, rho: RealNumber, theta: RealNumber, phi: RealNumber, degree: bool = False, spherical_repr: bool = False):
         
         self.rho = rho
         self.theta = theta
         self.phi = phi
+        
+        self._spherical_repr = spherical_repr
         
         if degree:
             
             rho = math.radians(rho)
             phi = math.radians(phi)
             
-        self.x = mathutils.closestnum(rho * math.sin(phi) * math.cos(theta))
-        self.y = mathutils.closestnum(rho * math.sin(phi) * math.sin(theta))
-        self.z = mathutils.closestnum(rho * math.cos(phi))
+        self.x = closestnum(rho * math.sin(phi) * math.cos(theta))
+        self.y = closestnum(rho * math.sin(phi) * math.sin(theta))
+        self.z = closestnum(rho * math.cos(phi))
         
         super().__init__(self.x, self.y, self.z)
         
@@ -514,14 +543,17 @@ class Spherical(Vector3):
         
         # Figure out a way to factor pi out and represent it.
         
-        return str((self.rho, self.theta, self.phi))
-    
-    def __repr__(self) -> str:
+        if self._spherical_repr:
+            
+            pretty_theta = where_is_pi(self.theta)
+            pretty_phi = where_is_pi(self.phi)
+            
+            return f'({self.rho}, {pretty_theta}, {pretty_phi})'
         
-        return self.__str__()
+        return str((self.x, self.y, self.z))
 
 
-def angle(a: 'Vector3', b: 'Vector3', degree: bool = False) -> Union[int, float]:
+def angle(a: 'Vector3', b: 'Vector3', degree: bool = False) -> RealNumber:
 
     if degree:
         

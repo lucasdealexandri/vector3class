@@ -1,7 +1,10 @@
 from typing import Union
+from fractions import Fraction
 import math
 
-def closestint(result: float, tolerance: float = 1e-9) -> Union[int, float]:
+RealNumber = Union[int, float]
+
+def closestint(result: float, tolerance: float = 1e-9) -> RealNumber:
     
     '''
     A function that balances float point precision.
@@ -53,7 +56,7 @@ def closestfloat(number: float) -> float:
         
     return float(str(number).split(6*'0')[0])
 
-def closestnum(number: Union[int, float]) -> Union[int, float]:
+def closestnum(number: RealNumber) -> RealNumber:
     
     '''
     This function unifies closestint and closestfloat.
@@ -62,3 +65,20 @@ def closestnum(number: Union[int, float]) -> Union[int, float]:
     number = closestint(closestfloat(number))
     
     return number
+
+def where_is_pi(number: RealNumber, tolerance: float = 1e-7, limit_denominator: int = 200) -> str:
+    
+    fitting_pi = number / math.pi
+    approximation = Fraction(fitting_pi).limit_denominator(limit_denominator)
+    
+    if -tolerance <= approximation - fitting_pi <= tolerance:
+        
+        return f'{approximation} pi'
+    
+    return number
+
+if __name__ == '__main__':
+    
+    a = 2 / 300 * math.pi
+    
+    print(where_is_pi(a))

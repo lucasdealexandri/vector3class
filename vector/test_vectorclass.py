@@ -22,4 +22,4 @@ k = Vector3(0, 0, 1)
 
 # print(Spherical(1, pi, 2 / 3 * pi))
 
-print((Spherical(0, 0, 0).beautify()))
+print(Vector3(1, 1, 1).to_cylindrical())

@@ -2,7 +2,7 @@
 
 import math
 from typing import Union
-from vectorutils import closestnum, where_is_pi
+from vectorutils import closestnum, where_is_pi, pretty_sqrt
 
 RealNumber = Scalar = Union[int, float]
 Coordinate = Union[list, tuple]
@@ -325,16 +325,22 @@ class Vector3:
 
         return closestnum(math.sqrt(sum(components_square)))
 
-    def to_cylindrical(self):
+    def to_cylindrical(self) -> str:
+        '''
+        Outputs the cylindrical coordinate of the vector, and in a pretty manner.
+        '''
 
-        self.r = closestnum(math.sqrt(self.x ** 2 + self.y ** 2))
         self.theta = closestnum(math.atan2(self.y, self.x))
-
+    
+        pretty_r = self.compact_radius()['r']
         pretty_theta = where_is_pi(self.theta)
 
-        return f'({self.r}, {pretty_theta}, {self.z})'
+        return f'({pretty_r}, {pretty_theta}, {self.z})'
 
     def to_spherical(self):
+        '''
+        Outputs the spherical coordinate of the vector, also in a pretty manner.
+        '''
 
         sum_squared_components = sum(
             [components ** 2 for components in (self.x, self.y, self.z)])
@@ -343,12 +349,13 @@ class Vector3:
         self.theta = closestnum(math.atan2(self.y, self.x))
         self.phi = closestnum(math.acos(self.z / self.rho))
 
+        pretty_rho = self.compact_radius()['rho']
         pretty_theta = where_is_pi(self.theta)
         pretty_phi = where_is_pi(self.phi)
 
-        return f'({self.rho}, {pretty_theta}, {pretty_phi})'
+        return f'({pretty_rho}, {pretty_theta}, {pretty_phi})'
 
-    def beautify(self) -> str:
+    def component_output(self) -> str:
         '''
         Base for pretty printing; it returns a vector (a, b, c) in the form of
         ai + bj + ck. This function also accounts for zero valued components
@@ -435,9 +442,30 @@ class Vector3:
 
         return pprint_string
 
+    def compact_radius(self) -> str:
+        '''
+        This function makes clear the presence of square roots, so the output
+        of conversions to polar, cylindrical, and spherical coordinate vectors become nicer.
+        
+        For instance, the radius "r", used in cylindrical coordinates, for Vector3(1, 1, 1) is 1.414213...
+        and the radius "rho", used in spherical coordinates, for the same vector is 1.732050...
+        Both are, successively, sqrt(2) and sqrt(3), and this is how the function represents them.
+        
+        Also works for, for instance, the radius "rho" for Vector(1, 1, 4) is sqrt(18),
+        which can also be represented as 3 sqrt(2), and this is how the function represents it.
+        '''
+        
+        sum_squared_2d_components = closestnum(self.x ** 2 + self.y ** 2)
+        sum_squared_3d_components = closestnum(self.x ** 2 + self.y ** 2 + self.z ** 2)
+        
+        r = pretty_sqrt(sum_squared_2d_components)
+        rho = pretty_sqrt(sum_squared_3d_components)
+        
+        return {'r': r, 'rho': rho}
+
     def pprint(self) -> None:
 
-        print(self.beautify())
+        print(self.component_output())
 
 
 class MagAngle(Vector3):

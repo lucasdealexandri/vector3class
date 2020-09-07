@@ -1,4 +1,5 @@
-from vector3 import Vector3, MagAngle, angle
+from vector3 import Vector3, Spherical, Cylindrical, Polar, MagAngle, angle
+from math import pi
 
 a = Vector3(0, 0, 1)
 b = Vector3(1, 0, 2)
@@ -19,4 +20,6 @@ k = Vector3(0, 0, 1)
 
 # Vector3(1, 1, 1).pprint()
 
-print(F * d, F.dot(d))
+# print(Spherical(1, pi, 2 / 3 * pi))
+
+print((Spherical(0, 0, 0).beautify()))

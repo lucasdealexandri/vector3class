@@ -6,8 +6,8 @@ import math
 
 RealNumber = Union[int, float]
 
-def closestint(result: float, tolerance: float = 1e-9) -> RealNumber:
 
+def closestint(result: float, tolerance: float = 1e-9) -> RealNumber:
     '''
     A function that balances float point precision.
 
@@ -29,8 +29,8 @@ def closestint(result: float, tolerance: float = 1e-9) -> RealNumber:
 
     return result
 
-def closestfloat(number: float) -> float:
 
+def closestfloat(number: float) -> float:
     '''
     This function comes with the same purpose as closestint, however, as the name suggests,
     it targets floats.
@@ -48,6 +48,7 @@ def closestfloat(number: float) -> float:
     if 6 * '9' in str(number):
 
         number_string = str(number).split(6 * '9')[0]
+        if number_string[-1] == '.': number_string = number_string[:-1]
 
         last_digit = int(number_string[-1])
         new_last_digit = str(last_digit + 1)
@@ -58,8 +59,8 @@ def closestfloat(number: float) -> float:
 
     return float(str(number).split(6*'0')[0])
 
-def closestnum(number: RealNumber) -> RealNumber:
 
+def closestnum(number: RealNumber) -> RealNumber:
     '''
     This function unifies closestint and closestfloat.
     '''
@@ -68,15 +69,15 @@ def closestnum(number: RealNumber) -> RealNumber:
 
     return number
 
-def where_is_pi(angle: RealNumber, tolerance: float = 1e-7, limit_denominator: int = 200) -> str:
 
+def where_is_pi(angle: RealNumber, tolerance: float = 1e-7, limit_denominator: int = 200) -> str:
     '''
     This function looks for a reasonable constant multiplying pi and make it obvious
     e.g. instead of displaying "2.0943951023931953", this function will display a nice
     "2/3 pi". Much friendlier huh?!
     '''
 
-    angle = essential_angle(angle)
+    angle = closestnum(essential_angle(angle))
 
     if angle == 0:
 
@@ -95,11 +96,13 @@ def where_is_pi(angle: RealNumber, tolerance: float = 1e-7, limit_denominator: i
 
     return f'{angle}'
 
+
 def essential_angle(angle: RealNumber) -> float:
 
     tau = 2 * math.pi
 
     return angle - angle // tau * tau
+
 
 def prime_factors(number: int):
 
@@ -120,54 +123,58 @@ def prime_factors(number: int):
 
     return factors
 
+
 def pretty_sqrt(number: int) -> str:
-    
+
     if number != int(number):
-        
+
         return f'{number}'
-    
+
     factors = prime_factors(number)
     in_sqrt = []
     out_sqrt = []
-    
+
     while len(factors) > 1:
-        
+
         if duplet(factors):
-            
+
             out_sqrt.append(factors[0])
             remove_duplet(factors)
-            
+
         else:
-            
+
             in_sqrt.append(factors[0])
             factors.pop(0)
-            
+
     if len(factors) == 1:
-        
+
         in_sqrt.append(factors[0])
         factors.pop(0)
-        
+
     out_sqrt = int(np.prod(out_sqrt))
     in_sqrt = int(np.prod(in_sqrt))
 
     if in_sqrt == 1:
-        
+
         return f'{out_sqrt}'
-    
+
     if out_sqrt == 1:
-        
+
         return f'sqrt({in_sqrt})'
-    
+
     return f'{out_sqrt} sqrt({in_sqrt})'
-        
+
+
 def duplet(factors: list) -> bool:
-    
+
     return factors[0] == factors[1]
 
+
 def remove_duplet(factors: list) -> None:
-    
+
     factors.pop(0)
     factors.pop(0)
+
 
 if __name__ == '__main__':
 

@@ -50,6 +50,17 @@ class Vector3:
 
         self.values = (self.x, self.y, self.z)
 
+        sum_squared_2d_components = sum(
+            [components ** 2 for components in (self.x, self.y)])
+
+        sum_squared_3d_components = sum(
+            [components ** 2 for components in (self.x, self.y, self.z)])
+
+        self.r = closestnum(math.sqrt(sum_squared_2d_components))
+        self.rho = closestnum(math.sqrt(sum_squared_3d_components))
+        self.theta = closestnum(math.atan2(self.y, self.x))
+        self.phi = closestnum(math.acos(self.z / self.rho))
+
     def __len__(self) -> int:
 
         return self.dimension
@@ -325,123 +336,27 @@ class Vector3:
 
         return closestnum(math.sqrt(sum(components_square)))
 
-    def to_cylindrical(self) -> str:
+    def cylindrical_repr(self) -> str:
         '''
         Outputs the cylindrical coordinate of the vector, and in a pretty manner.
         '''
-
-        self.theta = closestnum(math.atan2(self.y, self.x))
     
         pretty_r = self.compact_radius()['r']
         pretty_theta = where_is_pi(self.theta)
 
         return f'({pretty_r}, {pretty_theta}, {self.z})'
 
-    def to_spherical(self):
+    def spherical_repr(self) -> str:
         '''
         Outputs the spherical coordinate of the vector, also in a pretty manner.
         '''
-
-        sum_squared_components = sum(
-            [components ** 2 for components in (self.x, self.y, self.z)])
-
-        self.rho = closestnum(math.sqrt(sum_squared_components))
-        self.theta = closestnum(math.atan2(self.y, self.x))
-        self.phi = closestnum(math.acos(self.z / self.rho))
 
         pretty_rho = self.compact_radius()['rho']
         pretty_theta = where_is_pi(self.theta)
         pretty_phi = where_is_pi(self.phi)
 
         return f'({pretty_rho}, {pretty_theta}, {pretty_phi})'
-
-    def component_output(self) -> str:
-        '''
-        Base for pretty printing; it returns a vector (a, b, c) in the form of
-        ai + bj + ck. This function also accounts for zero valued components
-        e.g. Vector3(1, 0, -4).beautify would return 1i - 4k
-        '''
-
-        # This is a mess I am so sorry
-
-        variables = []
-        signs = []
-        pprint_string = ''
-
-        if self.x != 0:
-
-            if self.x in (-1, 1):
-                x = 'i'
-            else:
-                x = f'{abs(closestnum(self.x))}i'
-
-            if self.x < 0:
-                signs.append(' - ')
-            else:
-                signs.append(' + ')
-
-        else:
-
-            x = ''
-            signs.append('')
-
-        variables.append(x)
-
-        if self.y != 0:
-
-            if self.y in (-1, 1):
-                y = 'j'
-            else:
-                y = f'{abs(closestnum(self.y))}j'
-
-            if self.y < 0:
-                signs.append(' - ')
-            else:
-                signs.append(' + ')
-
-        else:
-
-            y = ''
-            signs.append('')
-
-        variables.append(y)
-
-        if self.z != 0:
-
-            if self.z in (-1, 1):
-                z = 'k'
-            else:
-                z = f'{abs(closestnum(self.z))}k'
-
-            if self.z < 0:
-                signs.append(' - ')
-            else:
-                signs.append(' + ')
-
-        else:
-            z = ''
-            signs.append('')
-
-        variables.append(z)
-
-        signs = [sign for sign in signs if sign != '']
-        variables = [variable for variable in variables if variable != '']
-
-        if len(variables) == 0:
-
-            return 'null vector'
-
-        if signs[0] == ' + ':
-            signs[0] = ''
-        elif signs[0] == ' - ':
-            signs[0] = '-'
-
-        for i in range(len(variables)):
-
-            pprint_string += signs[i] + variables[i]
-
-        return pprint_string
-
+    
     def compact_radius(self) -> str:
         '''
         This function makes clear the presence of square roots, so the output
@@ -462,6 +377,80 @@ class Vector3:
         rho = pretty_sqrt(sum_squared_3d_components)
         
         return {'r': r, 'rho': rho}
+
+    def component_output(self) -> str:
+        '''
+        Base for pretty printing; it returns a vector (a, b, c) in the form of
+        ai + bj + ck. This function also accounts for zero valued components
+        e.g. Vector3(1, 0, -4).beautify would return 1i - 4k
+        '''
+
+        # This is a mess I am so sorry
+
+        variables = []
+        signs = []
+        pprint_string = ''
+
+        if self.x != 0:
+
+            if self.x in (-1, 1): x = 'i'
+            else: x = f'{abs(closestnum(self.x))}i'
+
+            if self.x < 0: signs.append(' - ')
+            else: signs.append(' + ')
+
+        else:
+
+            x = ''
+            signs.append('')
+
+        variables.append(x)
+
+        if self.y != 0:
+
+            if self.y in (-1, 1): y = 'j'
+            else: y = f'{abs(closestnum(self.y))}j'
+
+            if self.y < 0: signs.append(' - ')
+            else: signs.append(' + ')
+
+        else:
+
+            y = ''
+            signs.append('')
+
+        variables.append(y)
+
+        if self.z != 0:
+
+            if self.z in (-1, 1): z = 'k'
+            else: z = f'{abs(closestnum(self.z))}k'
+
+            if self.z < 0: signs.append(' - ')
+            else: signs.append(' + ')
+
+        else:
+            
+            z = ''
+            signs.append('')
+
+        variables.append(z)
+
+        signs = [sign for sign in signs if sign != '']
+        variables = [variable for variable in variables if variable != '']
+
+        if len(variables) == 0:
+
+            return 'null vector'
+
+        if signs[0] == ' + ': signs[0] = ''
+        elif signs[0] == ' - ': signs[0] = '-'
+
+        for i in range(len(variables)):
+
+            pprint_string += signs[i] + variables[i]
+
+        return pprint_string
 
     def pprint(self) -> None:
 
@@ -549,9 +538,10 @@ class Cylindrical(Vector3):
 
         if self._cylindrical_repr:
 
+            pretty_r = self.compact_radius()['r']
             pretty_theta = where_is_pi(self.theta)
 
-            return f'({self.r}, {pretty_theta}, {self.z}))'
+            return f'({pretty_r}, {pretty_theta}, {self.z}))'
 
         return str((self.x, self.y, self.z))
 
@@ -574,7 +564,7 @@ class Spherical(Vector3):
 
         if degree:
 
-            rho = math.radians(rho)
+            theta = math.radians(theta)
             phi = math.radians(phi)
 
         self.x = closestnum(rho * math.sin(phi) * math.cos(theta))
@@ -589,10 +579,11 @@ class Spherical(Vector3):
 
         if self._spherical_repr:
 
+            pretty_rho = self.compact_radius()['rho']
             pretty_theta = where_is_pi(self.theta)
             pretty_phi = where_is_pi(self.phi)
 
-            return f'({self.rho}, {pretty_theta}, {pretty_phi})'
+            return f'({pretty_rho}, {pretty_theta}, {pretty_phi})'
 
         return str((self.x, self.y, self.z))
 
